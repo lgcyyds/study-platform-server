@@ -1,5 +1,5 @@
 const Router = require('koa-router')
-const { find, findById } = require('../controllers/users')
+const { find, findById, login } = require('../controllers/users')
 // **配置路由前缀**
 const router = new Router({
     prefix: '/users'
@@ -7,6 +7,7 @@ const router = new Router({
 
 router.get('/', find)
 
-router.get('/:id',findById)
+// router.get('/:id', findById)
 
+router.get('/login', login)
 module.exports = router

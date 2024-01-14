@@ -5,14 +5,18 @@ const usersSchema = new Schema({
         required: true,
         unique: true
     },
-    password: {
-        type: String,
-        required: true
-    },
     email: {
+        type: String,
+    },
+    avatar: {
+        type: String,
+        required: true,
+        default: '/images/defaultImg.png'
+    },
+    openID: {
         type: String,
         required: true,
         unique: true
     },
 });
-module.exports = db.model('users', usersSchema);
+module.exports = db.model('user', usersSchema);

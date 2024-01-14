@@ -2,10 +2,7 @@ const mongoose = require('mongoose')
 
 let URL = 'mongodb://127.0.0.1:27017/study'
 //db是create方法返回的连接的数据库对象 可以控制多个数据库
-const db = mongoose.createConnection(URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+const db = mongoose.createConnection(URL)
 //检测是否链接成功
 db.on('open', () => {
     console.log('数据库连接成功:' + URL)
