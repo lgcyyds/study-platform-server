@@ -1,4 +1,7 @@
 const Router = require('koa-router')
-const router = new Router()
-
+const { createArticle } = require('../controllers/articles')
+const router = new Router({
+    prefix: '/articles'
+})
+router.post('/create', createArticle)
 module.exports = router
