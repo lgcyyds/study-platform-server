@@ -10,10 +10,12 @@ const questionsSchema = new Schema({
         type: String,
         required: true,
     },
-    options: {
-        type: Array,
-        required: true
-    },
+    options: [
+        {
+            type: Object,
+            required: true,
+        }
+    ],
     rightOption: {
         type: Number,
         required: true
@@ -31,4 +33,4 @@ const questionsSchema = new Schema({
         default: []
     },
 });
-module.exports = db.model('question', questionsSchema);
+module.exports = db.model('questions', questionsSchema);

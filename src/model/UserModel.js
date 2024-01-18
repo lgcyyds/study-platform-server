@@ -19,4 +19,4 @@ const usersSchema = new Schema({
         unique: true
     },
 });
-module.exports = db.model('user', usersSchema);
+module.exports = db.model('users', usersSchema);

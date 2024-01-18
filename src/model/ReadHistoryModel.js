@@ -14,4 +14,4 @@ const readHistorySchema = new Schema({
         }
     ],
 })
-module.exports = db.model('readHistory', readHistorySchema)
+module.exports = db.model('readHistorys', readHistorySchema)

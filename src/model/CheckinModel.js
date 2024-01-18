@@ -12,4 +12,4 @@ const checkinSchema = new Schema({
     },
 })
 
-module.exports = db.model('checkin', checkinSchema)
+module.exports = db.model('checkins', checkinSchema)

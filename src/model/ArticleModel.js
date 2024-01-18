@@ -33,4 +33,4 @@ const articleSchema = new Schema({
         default: 0
     }
 })
-module.exports = db.model('article', articleSchema)
+module.exports = db.model('articles', articleSchema)

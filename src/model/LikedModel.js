@@ -9,4 +9,4 @@ const likedSchema = new Schema({
         ref: 'article'
     },
 })
-module.exports = db.model('liked', likedSchema)
+module.exports = db.model('likeds', likedSchema)

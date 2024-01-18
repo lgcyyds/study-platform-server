@@ -23,4 +23,4 @@ const commentSchema = new Schema({
         required: true,
     },
 })
-module.exports = db.model('comment', commentSchema)
+module.exports = db.model('comments', commentSchema)
