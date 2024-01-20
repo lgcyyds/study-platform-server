@@ -1,6 +1,7 @@
 const axios = require('axios');
 const ExternalException = require('../exception/externalException');
 const successHandler = require('../utils/successHandler');
+const userModel = require('../model/UserModel')
 const { appID, appSecret } = require('../config');
 class UsersCtl {
     async find(ctx) {
@@ -16,12 +17,13 @@ class UsersCtl {
         try {
             const result = await axios.get(`https://api.weixin.qq.com/sns/jscode2session?appid=${appID}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`);
             if (result.data.session_key) {
+                const result = await userModel.findOne({ openID: result.data.openid })
                 successHandler(ctx, result.data)
             } else {
-                throw new ExternalException('微信登录失败!')
+                throw new ExternalException('登录失败!')
             }
         } catch (error) {
-            throw new ExternalException('微信登录失败')
+            throw new ExternalException('登录失败')
         }
     }
 

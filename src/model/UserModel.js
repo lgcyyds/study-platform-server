@@ -3,7 +3,7 @@ const usersSchema = new Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        default: '用户-' + new Date()
     },
     email: {
         type: String,
