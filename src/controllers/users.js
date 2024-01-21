@@ -17,12 +17,20 @@ class UsersCtl {
         try {
             const result = await axios.get(`https://api.weixin.qq.com/sns/jscode2session?appid=${appID}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`);
             if (result.data.session_key) {
-                const result = await userModel.findOne({ openID: result.data.openid })
-                successHandler(ctx, result.data)
+                const resultMsg = await userModel.findOne({ openID: result.data.openid })
+                if (!resultMsg) {
+                    const userMsg = await userModel.create({ openID: result.data.openid })
+                    successHandler(ctx, { msg: "登录成功", id: userMsg._id })
+                    return
+                }
+                successHandler(ctx, { msg: "登录成功", id: resultMsg._id })
             } else {
+
                 throw new ExternalException('登录失败!')
             }
         } catch (error) {
+            console.log(error);
+
             throw new ExternalException('登录失败')
         }
     }
