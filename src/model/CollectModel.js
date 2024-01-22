@@ -8,5 +8,9 @@ const collectedSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'article'
     },
+    questionId: {
+        type: Schema.Types.ObjectId,
+        ref: 'question'
+    },
 })
 module.exports = db.model('collects', collectedSchema)
