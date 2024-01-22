@@ -5,9 +5,5 @@ const router = new Router({
     prefix: '/users'
 })
 
-router.get('/', find)
-
-// router.get('/:id', findById)
-
 router.get('/login', login)
 module.exports = router
