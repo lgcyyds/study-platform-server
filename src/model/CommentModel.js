@@ -1,18 +1,18 @@
 const { db, Schema } = require('../mongodb/index')
 const commentSchema = new Schema({
-    comment: {
+    content: {
         type: String,
         required: true,
         trim: true,
         minlength: 1,
         maxlength: 200,
     },
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: 'user',
         required: true,
     },
-    article: {
+    articleId: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'article',

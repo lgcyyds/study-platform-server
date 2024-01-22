@@ -4,14 +4,6 @@ const successHandler = require('../utils/successHandler');
 const userModel = require('../model/UserModel')
 const { appID, appSecret } = require('../config');
 class UsersCtl {
-    async find(ctx) {
-        // 操作数据库一定要 await
-        ctx.body = '用户列表'
-    }
-    async findById(ctx) {
-        console.log(ctx.params);
-        ctx.body = `用户id：${ctx.params.id}`
-    }
     async login(ctx) {
         const code = ctx.query.code
         try {

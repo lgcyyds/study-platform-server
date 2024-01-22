@@ -37,6 +37,7 @@ class QuestionCtl {
             externalException('数据库查询错误')
         }
     }
+    //收藏题目
     async collectQuestion() {
 
     }
