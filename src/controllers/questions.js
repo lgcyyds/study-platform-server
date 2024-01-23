@@ -16,10 +16,9 @@ class QuestionCtl {
         }
     }
     async getQuestion(ctx) {
-        const { page, level, tag } = ctx.query
+        const { id, page = 1, level, tag } = ctx.query
         let sortRule = { _id: -1 }
         let findTitle = {}
-        console.log(page, level, tag);
         if (level) {
             sortRule = {
                 level: level == 1 ? 1 : -1,
@@ -28,6 +27,9 @@ class QuestionCtl {
         }
         if (tag) {
             findTitle = { tags: { $elemMatch: { $regex: tag, $options: "i" } } }//不区分大小写
+        }
+        if (id) {
+            findTitle = { _id: id }
         }
         try {
             const result = await questionModel.find(findTitle).sort(sortRule).skip(10 * (page - 1)).limit(10)

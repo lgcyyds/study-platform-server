@@ -6,11 +6,13 @@ const collectedSchema = new Schema({
     },
     articleId: {
         type: Schema.Types.ObjectId,
-        ref: 'article'
+        ref: 'article',
+        default: null
     },
     questionId: {
         type: Schema.Types.ObjectId,
-        ref: 'question'
+        ref: 'question',
+        default: null
     },
 })
 module.exports = db.model('collects', collectedSchema)
