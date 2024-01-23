@@ -22,5 +22,9 @@ const commentSchema = new Schema({
         default: false,
         required: true,
     },
+    commentTime: {
+        type: Date,
+        default: Date.now(),
+    },
 })
 module.exports = db.model('comments', commentSchema)
