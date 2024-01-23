@@ -17,7 +17,7 @@ const articleSchema = new Schema({
     },
     createdTime: {
         type: Date,
-        default: Date.now,
+        default: Date.now(),
     },
     visited: {
         type: Number,

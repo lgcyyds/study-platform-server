@@ -1,14 +1,14 @@
 const { db, Schema } = require('../mongodb/index')
 const checkinSchema = new Schema({
     userId: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'user',
         required: true,
-        unique: true
     },
     checkinTime: {
         type: Date,
         required: true,
-        default: Date.now
+        default: Date.now()
     },
 })
 
