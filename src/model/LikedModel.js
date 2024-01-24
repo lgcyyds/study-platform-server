@@ -8,5 +8,10 @@ const likedSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'article'
     },
+    readMark: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
 })
 module.exports = db.model('likeds', likedSchema)

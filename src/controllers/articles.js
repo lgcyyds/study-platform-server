@@ -4,6 +4,8 @@ const successHandler = require('../utils/successHandler');
 const likedModel = require('../model/LikedModel.js')
 const collectModel = require('../model/CollectModel.js')
 const commentModel = require('../model/CommentModel.js')
+const quetionModel = require('../model/QuestionModel.js')
+const mongoose = require('mongoose')
 class articlesCtl {
     async addArticle(ctx) {
         const param = ctx.request.body
@@ -67,7 +69,7 @@ class articlesCtl {
             console.log(error);
             throw new externalException('数据库出错')
         }
-        
+
 
     }
     // 评论文章
@@ -83,6 +85,91 @@ class articlesCtl {
         } catch (error) {
             throw new externalException('数据库出错')
         }
+    }
+    //获取点赞的文章
+    async getLikeArticle(ctx) {
+        const id = ctx.query.id
+        try {
+            const result = await likedModel.find({ userId: id })
+            if (result.length) {
+                let articleIdList = result.map(element => {
+                    return element.articleId
+                })
+                const articleList = await articleModel.aggregate([{ $match: { _id: { $in: articleIdList } } }])
+                successHandler(ctx, articleList)
+            } else {
+                successHandler(ctx, { message: "没有点赞文章" })
+            }
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //获取收藏的文章和题目
+    async getCollectAll(ctx) {
+        const id = ctx.query.id
+        try {
+            const articleList = await collectModel.find({ userId: id, questionId: null })
+            const questionList = await collectModel.find({ userId: id, articleId: null })
+            if (articleList.length || questionList.length) {
+                let articleIdList = articleList.map(element => {
+                    return element.articleId
+                })
+                let questionIdList = questionList.map(element => {
+                    return element.questionId
+                })
+                const articleListResult = await articleModel.aggregate([{ $match: { _id: { $in: articleIdList } } }])
+                const questionListResult = await quetionModel.aggregate([{ $match: { _id: { $in: questionIdList } } }])
+                successHandler(ctx, { articleListResult, questionListResult })
+                return
+            }
+            successHandler(ctx, { message: "没有收藏文章和题目" })
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
+    }
+    //编辑文章
+    async editArticle(ctx) {
+        const {id , title, content } = ctx.request.body
+        try {
+            const result = await articleModel.updateOne({ _id: id }, { title, content })
+            successHandler(ctx, result)
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //删除文章
+    async delArticle(ctx) {
+        const id = ctx.query.id
+        try {
+            const result = await articleModel.deleteOne({ _id: id })
+            successHandler(ctx, result)
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //获取阅读历史
+    async getReadHistory(ctx) {
+        const articleList = JSON.parse(ctx.query.articleList)
+        try {
+            const result = await articleModel.find({ _id: { $in: articleList }})
+            successHandler(ctx, result)
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
+    }
+    //获取点赞我的人和对应的文章
+    async getLikeArticleMsg() {
+        
+    }
+    //获取收藏我文章的人和对应文章的标题和id
+    async getcollectArticleMsg() {
+
+    }
+    //获取评论我文章的人和对应的评论内容和文章标题及id
+    async getCommentArticleMsg() {
+
     }
 }
 module.exports = new articlesCtl

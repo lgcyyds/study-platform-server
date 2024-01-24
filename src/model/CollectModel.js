@@ -6,11 +6,18 @@ const collectedSchema = new Schema({
     },
     articleId: {
         type: Schema.Types.ObjectId,
-        ref: 'article'
+        ref: 'article',
+        default: null
     },
     questionId: {
         type: Schema.Types.ObjectId,
-        ref: 'question'
+        ref: 'question',
+        default: null
+    },
+    readMark: {
+        type: Boolean,
+        default: false,
+        required: true,
     },
 })
 module.exports = db.model('collects', collectedSchema)
