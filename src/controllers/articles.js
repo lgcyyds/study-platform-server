@@ -20,8 +20,11 @@ class articlesCtl {
             throw new externalException('数据库插入错误')
         }
     }
+    //文章图片上传
+
+
     async getArticle(ctx) {
-        const { id, collected, liked, keywords, page } = ctx.request.body
+        const { id, collected, liked, keywords, page } = ctx.query
         let sortRule = { createdTime: -1 }
         let findRule = {}
         if (collected) {
@@ -130,7 +133,7 @@ class articlesCtl {
     }
     //编辑文章
     async editArticle(ctx) {
-        const {id , title, content } = ctx.request.body
+        const { id, title, content } = ctx.request.body
         try {
             const result = await articleModel.updateOne({ _id: id }, { title, content })
             successHandler(ctx, result)
@@ -152,7 +155,7 @@ class articlesCtl {
     async getReadHistory(ctx) {
         const articleList = JSON.parse(ctx.query.articleList)
         try {
-            const result = await articleModel.find({ _id: { $in: articleList }})
+            const result = await articleModel.find({ _id: { $in: articleList } })
             successHandler(ctx, result)
         } catch (error) {
             console.log(error);
@@ -160,16 +163,181 @@ class articlesCtl {
         }
     }
     //获取点赞我的人和对应的文章
-    async getLikeArticleMsg() {
-        
+    async getLikeArticleMsg(ctx) {
+        const id = ctx.query.id
+        const userId = new mongoose.Types.ObjectId(id)
+        try {
+            const result = await articleModel.aggregate([
+                {
+                    $match: { author: userId }
+                },
+                {
+                    $lookup: {
+                        from: 'likeds',
+                        localField: '_id',
+                        foreignField: 'articleId',
+                        as: 'liked'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$liked',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'liked.userId',
+                        foreignField: '_id',
+                        as: 'userInfo'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        liked: 1,
+                        userInfo: {
+                            $let: {
+                                vars: {
+                                    userInfoElement: { $arrayElemAt: ['$userInfo', 0] }
+                                },
+                                in: {
+                                    username: '$$userInfoElement.username',
+                                    avatar: '$$userInfoElement.avatar'
+                                }
+                            }
+                        }
+                    }
+                }
+            ])
+            successHandler(ctx, result)
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
     }
     //获取收藏我文章的人和对应文章的标题和id
-    async getcollectArticleMsg() {
-
+    async getcollectArticleMsg(ctx) {
+        const id = ctx.query.id
+        const userId = new mongoose.Types.ObjectId(id)
+        try {
+            const result = await articleModel.aggregate([
+                {
+                    $match: { author: userId }
+                },
+                {
+                    $lookup: {
+                        from: 'collects',
+                        localField: '_id',
+                        foreignField: 'articleId',
+                        as: 'collected'
+                    }
+                },
+                {
+                    $unwind: {
+                        path: '$collected',
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'collected.userId',
+                        foreignField: '_id',
+                        as: 'userInfo'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        collected: 1,
+                        userInfo: {
+                            $let: {
+                                vars: {
+                                    userInfoElement: { $arrayElemAt: ['$userInfo', 0] }
+                                },
+                                in: {
+                                    username: '$$userInfoElement.username',
+                                    avatar: '$$userInfoElement.avatar'
+                                }
+                            }
+                        }
+                    }
+                }
+            ])
+            successHandler(ctx, result)
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
     }
     //获取评论我文章的人和对应的评论内容和文章标题及id
-    async getCommentArticleMsg() {
-
+    async getCommentArticleMsg(ctx) {
+        const id = ctx.query.id
+        const userId = new mongoose.Types.ObjectId(id)
+        try {
+            let result = await articleModel.aggregate([
+                {
+                    $match: { author: userId }
+                },
+                {
+                    $lookup: {
+                        from: 'comments',
+                        localField: '_id',
+                        foreignField: 'articleId',
+                        as: 'comment'
+                    }
+                },
+                {
+                    $unwind: '$comment'
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'comment.userId',
+                        foreignField: '_id',
+                        as: 'userInfo'
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        title: { $first: '$title' },
+                        content: { $first: '$content' },
+                        author: { $first: '$author' },
+                        userInfo: { $first: '$userInfo' },
+                        lastComment: { $first: '$comment' }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        title: 1,
+                        content: 1,
+                        author: 1,
+                        userInfo: {
+                            $let: {
+                                vars: {
+                                    userInfoElement: { $arrayElemAt: ['$userInfo', 0] }
+                                },
+                                in: {
+                                    username: '$$userInfoElement.username',
+                                    avatar: '$$userInfoElement.avatar'
+                                }
+                            }
+                        },
+                        lastComment: 1
+                    }
+                }
+            ])
+            successHandler(ctx, result)
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
     }
 }
 module.exports = new articlesCtl

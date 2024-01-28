@@ -8,7 +8,7 @@ const checkinSchema = new Schema({
     checkinTime: {
         type: Date,
         required: true,
-        default: Date.now()
+        default: () => Date.now()
     },
 })
 

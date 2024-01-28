@@ -34,8 +34,8 @@ class UsersCtl {
         now.setHours(0, 0, 0, 0)
         let time = now.getTime()
         try {
-            const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime :-1}).limit(1)
-            if (result&&result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
+            const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime: -1 }).limit(1)
+            if (result && result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
                 successHandler(ctx, { message: '今天已经签到了' })
                 return
             }
@@ -46,6 +46,8 @@ class UsersCtl {
             throw new ExternalException('签到失败')
         }
     }
+    //修改个人信息
+    
 }
 
 module.exports = new UsersCtl
