@@ -21,7 +21,13 @@ class articlesCtl {
         }
     }
     //文章图片上传
-
+    async uploadCover(ctx) {
+        let result = {
+            filename: ctx.req.file.filename,//返回文件名
+            body: ctx.req.body
+        }
+        successHandler(ctx, result)
+    }
 
     async getArticle(ctx) {
         const { id, collected, liked, keywords, page } = ctx.query
@@ -35,7 +41,7 @@ class articlesCtl {
         if (keywords) {
             findRule = { title: { $regex: keywords, $options: 'i' } }
         } else if (id) {
-            findRule = { _id: id }
+            findRule = { $or: [{ _id: id }, { author: id }] }
         }
         try {
             const result = await articleModel.find(findRule).sort(sortRule).skip(10 * (page - 1)).limit(10)
@@ -85,6 +91,45 @@ class articlesCtl {
             } else {
                 successHandler(ctx, { message: "评论失败" })
             }
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //删除我的文章里面的评论
+    async delMyArticleComment(ctx) {
+        const { userId, articleId, id } = ctx.request.body
+        try {
+            const result = await articleModel.find({ author: userId, _id: articleId })
+            if (result.length) {
+                await commentModel.deleteOne({ _id: id })
+                successHandler(ctx, { message: "删除成功" })
+            } else {
+                successHandler(ctx, { message: "你没有权限删除这条评论" })
+            }
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //删除我的评论
+    async delMyComment(ctx) {
+        const { userId,id } = ctx.request.body
+        try {
+            const result = await commentModel.deleteOne({ userId: userId, _id: id })
+            if (result.deletedCount == 0) {
+                successHandler(ctx, { message: "你没有权限删除这条评论" })
+            } else {
+                successHandler(ctx, { message: "删除成功" })  
+            }          
+        } catch (error) {
+            throw new externalException('数据库出错')
+        }
+    }
+    //获取文章评论
+    async getComment(ctx) {
+        const id = ctx.query.id
+        try {
+            const result = await commentModel.find({ articleId: id }).sort({_id:-1})
+            successHandler(ctx, result)
         } catch (error) {
             throw new externalException('数据库出错')
         }

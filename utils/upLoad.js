@@ -3,7 +3,13 @@ const multer = require('koa-multer');
 let storage = multer.diskStorage({
     //文件保存路径
     destination: function (req, file, cb) {
-        cb(null, 'public/uploads/')  //注意路径必须存在
+        let type = req.url.split('/')[2]
+        console.log(type);
+        if (type == 'uploadArticleCover') {
+            cb(null, 'public/articleCover/')  //注意路径必须存在
+        } else {
+            cb(null, 'public/userAvatar/')  //注意路径必须存在
+        }
     },
     //修改文件名称
     filename: function (req, file, cb) {
