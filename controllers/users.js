@@ -13,10 +13,20 @@ class UsersCtl {
                 const resultMsg = await userModel.findOne({ openID: result.data.openid })
                 if (!resultMsg) {
                     const userMsg = await userModel.create({ openID: result.data.openid })
-                    successHandler(ctx, { msg: "登录成功", id: userMsg._id })
+                    let userInfo = {
+                        id: userMsg._id,
+                        username: userMsg.username,
+                        avatar: userMsg.avatar
+                    }
+                    successHandler(ctx, { msg: "登录成功", userInfo })
                     return
                 }
-                successHandler(ctx, { msg: "登录成功", id: resultMsg._id })
+                let userInfo = {
+                    id: resultMsg._id,
+                    username: resultMsg.username,
+                    avatar: resultMsg.avatar
+                }
+                successHandler(ctx, { msg: "登录成功", userInfo })
             } else {
 
                 throw new ExternalException('登录失败!')
@@ -34,8 +44,8 @@ class UsersCtl {
         now.setHours(0, 0, 0, 0)
         let time = now.getTime()
         try {
-            const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime :-1}).limit(1)
-            if (result&&result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
+            const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime: -1 }).limit(1)
+            if (result && result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
                 successHandler(ctx, { message: '今天已经签到了' })
                 return
             }
@@ -45,6 +55,24 @@ class UsersCtl {
             console.log(error);
             throw new ExternalException('签到失败')
         }
+    }
+    //修改个人信息
+    async editUserInfo(ctx) {
+        const { id, username, avatar, email } = ctx.request.body
+        try {
+            let result = await userModel.updateOne({ _id: id }, { username, avatar, email })
+            successHandler(ctx, { message: '修改成功' })
+        } catch (error) {
+            throw new ExternalException('修改失败')
+        }
+    }
+    //头像上传
+    async uploadAvatar(ctx) {
+        let result = {
+            filename: ctx.req.file.filename,//返回文件名
+            body: ctx.req.body
+        }
+        successHandler(ctx, result)
     }
 }
 

@@ -16,7 +16,7 @@ class QuestionCtl {
         }
     }
     async getQuestion(ctx) {
-        const { id, page = 1, level, tag } = ctx.query
+        const { id, page = 1, level, tag, keywords } = ctx.query
         let sortRule = { _id: -1 }
         let findTitle = {}
         if (level) {
@@ -30,6 +30,9 @@ class QuestionCtl {
         }
         if (id) {
             findTitle = { _id: id }
+        }
+        if (keywords) {
+            findTitle = { title: { $regex: keywords } }
         }
         try {
             const result = await questionModel.find(findTitle).sort(sortRule).skip(10 * (page - 1)).limit(10)
