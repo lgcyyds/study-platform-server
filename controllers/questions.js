@@ -31,7 +31,7 @@ class QuestionCtl {
         if (id) {
             findTitle = { _id: id }
         }
-        if (keywords) {
+        if (keywords && keywords!=='') {
             findTitle = { title: { $regex: keywords } }
         }
         try {
