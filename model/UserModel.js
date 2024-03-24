@@ -11,7 +11,7 @@ const usersSchema = new Schema({
     avatar: {
         type: String,
         required: true,
-        default: 'defaultImg.png'
+        default: '/defaultImg.png'
     },
     openID: {
         type: String,

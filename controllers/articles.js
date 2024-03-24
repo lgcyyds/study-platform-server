@@ -56,6 +56,8 @@ class articlesCtl {
     async collectOrLikeArticle(ctx) {
         const { userId, articleId, type } = ctx.request.body
         //type=0是点赞   1是收藏
+        console.log(userId, articleId, type, ctx.request.body);
+
         try {
             if (type) {//收藏
                 const findResult = await collectModel.findOne({ userId, articleId })
@@ -112,14 +114,14 @@ class articlesCtl {
     }
     //删除我的评论
     async delMyComment(ctx) {
-        const { userId,id } = ctx.request.body
+        const { userId, id } = ctx.request.body
         try {
             const result = await commentModel.deleteOne({ userId: userId, _id: id })
             if (result.deletedCount == 0) {
                 successHandler(ctx, { message: "你没有权限删除这条评论" })
             } else {
-                successHandler(ctx, { message: "删除成功" })  
-            }          
+                successHandler(ctx, { message: "删除成功" })
+            }
         } catch (error) {
             throw new externalException('数据库出错')
         }
@@ -127,8 +129,22 @@ class articlesCtl {
     //获取文章评论
     async getComment(ctx) {
         const id = ctx.query.id
+        const articleId = new mongoose.Types.ObjectId(id)
         try {
-            const result = await commentModel.find({ articleId: id }).sort({_id:-1})
+            // const result = await commentModel.find({ articleId: id }).sort({ _id: -1 })
+            const result = await commentModel.aggregate([
+                {
+                    $match: { articleId: articleId }
+                },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'userId',
+                        foreignField: '_id',
+                        as: 'userInfo'
+                    }
+                },
+            ])
             successHandler(ctx, result)
         } catch (error) {
             throw new externalException('数据库出错')
