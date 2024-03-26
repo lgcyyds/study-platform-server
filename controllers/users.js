@@ -3,6 +3,8 @@ const ExternalException = require('../exception/externalException');
 const successHandler = require('../utils/successHandler');
 const userModel = require('../model/UserModel')
 const checkInModel = require('../model/CheckinModel')
+const CollectModel = require('../model/CollectModel')
+const ArticleModel = require('../model/ArticleModel')
 const { appID, appSecret } = require('../config');
 class UsersCtl {
     async login(ctx) {
@@ -74,7 +76,18 @@ class UsersCtl {
         }
         successHandler(ctx, result)
     }
-    //查询签到天数
+    //查询签到天数、收藏数量和文章数量
+    async getOtherInfo(ctx) {
+        const id = ctx.query.id
+        try {
+            let checkInCount = await checkInModel.find({ userId: id }).countDocuments()
+            let collectCount = await CollectModel.find({ userId: id }).countDocuments()
+            let myArticleCount = await ArticleModel.find({ author: id }).countDocuments()
+            successHandler(ctx, { checkInCount, collectCount, myArticleCount })
+        } catch (error) {
+            throw new ExternalException('数据库出错')
+        }
+    }
 }
 
 module.exports = new UsersCtl
