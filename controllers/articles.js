@@ -56,8 +56,7 @@ class articlesCtl {
     async collectOrLikeArticle(ctx) {
         const { userId, articleId, type } = ctx.request.body
         //type=0是点赞   1是收藏
-        console.log(userId, articleId, type, ctx.request.body);
-
+        console.log(type);
         try {
             if (type) {//收藏
                 const findResult = await collectModel.findOne({ userId, articleId })
@@ -65,15 +64,19 @@ class articlesCtl {
                     const updateResult = await collectModel.create({ userId, articleId })
                     successHandler(ctx, { message: "收藏成功" })
                 } else {
-                    successHandler(ctx, { message: "不可重复收藏" })
+                    const updateResult = await collectModel.deleteOne({ userId, articleId })
+                    successHandler(ctx, { message: "取消收藏成功" })
                 }
             } else {//点赞
                 const findResult = await likedModel.findOne({ userId, articleId })
+                console.log(findResult, userId, articleId);
                 if (!findResult) {
                     const updateResult = await likedModel.create({ userId, articleId })
                     successHandler(ctx, { message: "点赞成功" })
                 } else {
-                    successHandler(ctx, { message: "不可重复点赞" })
+                    const updateResult = await likedModel.deleteOne({ userId, articleId })
+                    console.log(updateResult,121);
+                    successHandler(ctx, { message: "取消点赞成功" })
                 }
             }
         } catch (error) {
@@ -86,6 +89,7 @@ class articlesCtl {
     // 评论文章
     async commentArticle(ctx) {
         const { userId, articleId, content } = ctx.request.body
+        console.log(userId, articleId, content);
         try {
             const result = await commentModel.create({ userId, articleId, content })
             if (result) {

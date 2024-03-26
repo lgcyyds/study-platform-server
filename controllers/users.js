@@ -74,6 +74,7 @@ class UsersCtl {
         }
         successHandler(ctx, result)
     }
+    //查询签到天数
 }
 
 module.exports = new UsersCtl
