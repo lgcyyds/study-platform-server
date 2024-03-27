@@ -404,5 +404,13 @@ class articlesCtl {
             throw new externalException('数据库出错')
         }
     }
+    //获取文章的点赞和收藏状态以及数量
+    async getLikedAndCollectStatus() {
+        
+    }
+    //获取文章作者信息
+    async getAuthorInfo() {
+        
+    }
 }
 module.exports = new articlesCtl

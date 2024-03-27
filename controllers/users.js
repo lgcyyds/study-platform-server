@@ -48,15 +48,19 @@ class UsersCtl {
         try {
             const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime: -1 }).limit(1)
             if (result && result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
-                successHandler(ctx, { message: '今天已经签到了' })
+                successHandler(ctx, { message: '今天已经签到了', code: 0 })
                 return
             }
             const signResult = await checkInModel.create({ userId: id, checkinTime: Date.now() })
-            successHandler(ctx, signResult)
+            successHandler(ctx, { message: '签到成功', code:1 })
         } catch (error) {
             console.log(error);
             throw new ExternalException('签到失败')
         }
+    }
+    //查询签到情况
+    async checkSignIn(ctx) {
+        
     }
     //修改个人信息
     async editUserInfo(ctx) {
