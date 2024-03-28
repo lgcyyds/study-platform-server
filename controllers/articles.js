@@ -33,9 +33,9 @@ class articlesCtl {
         const { id, collected, liked, keywords, page } = ctx.query
         let sortRule = { createdTime: -1 }
         let findRule = {}
-        if (collected) {
+        if (collected == 1) {
             sortRule = { collected: -1 }
-        } else if (liked) {
+        } else if (liked == 1) {
             sortRule = { liked: -1 }
         }
         if (keywords) {
