@@ -52,7 +52,7 @@ class UsersCtl {
                 return
             }
             const signResult = await checkInModel.create({ userId: id, checkinTime: Date.now() })
-            successHandler(ctx, { message: '签到成功', code:1 })
+            successHandler(ctx, { message: '签到成功', code: 1 })
         } catch (error) {
             console.log(error);
             throw new ExternalException('签到失败')
@@ -60,7 +60,22 @@ class UsersCtl {
     }
     //查询签到情况
     async checkSignIn(ctx) {
-        
+        const id = ctx.query.id
+        //当天凌晨时间戳
+        let now = new Date()
+        now.setHours(0, 0, 0, 0)
+        let time = now.getTime()
+        try {
+            const result = await checkInModel.findOne({ userId: id }).sort({ checkinTime: -1 }).limit(1)
+            if (result && result.checkinTime > time) {//最后一次签到是今天凌晨后不允许签到
+                successHandler(ctx, { message: '今天已经签到了', code: 1 })
+                return
+            }
+            successHandler(ctx, { message: '今天没有签到', code: 0 })
+        } catch (error) {
+            console.log(error);
+            throw new ExternalException('签到失败')
+        }
     }
     //修改个人信息
     async editUserInfo(ctx) {

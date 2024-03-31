@@ -5,6 +5,7 @@ const likedModel = require('../model/LikedModel.js')
 const collectModel = require('../model/CollectModel.js')
 const commentModel = require('../model/CommentModel.js')
 const quetionModel = require('../model/QuestionModel.js')
+const userModel = require('../model/UserModel')
 const mongoose = require('mongoose')
 class articlesCtl {
     async addArticle(ctx) {
@@ -75,7 +76,7 @@ class articlesCtl {
                     successHandler(ctx, { message: "点赞成功" })
                 } else {
                     const updateResult = await likedModel.deleteOne({ userId, articleId })
-                    console.log(updateResult,121);
+                    console.log(updateResult, 121);
                     successHandler(ctx, { message: "取消点赞成功" })
                 }
             }
@@ -405,12 +406,19 @@ class articlesCtl {
         }
     }
     //获取文章的点赞和收藏状态以及数量
-    async getLikedAndCollectStatus() {
-        
+    async getLikedAndCollectStatus(ctx) {
+
     }
     //获取文章作者信息
-    async getAuthorInfo() {
-        
+    async getAuthorInfo(ctx) {
+        const id = ctx.query.id
+        try {
+            const result = await userModel.findById(id)
+            successHandler(ctx, result)
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
+        }
     }
 }
 module.exports = new articlesCtl

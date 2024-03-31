@@ -12,7 +12,7 @@ class QuestionCtl {
                 successHandler(ctx, result)
             }
         } catch (error) {
-            externalException('数据库插入错误')
+            throw new externalException('数据库插入错误')
         }
     }
     async getQuestion(ctx) {
@@ -31,7 +31,7 @@ class QuestionCtl {
         if (id) {
             findTitle = { _id: id }
         }
-        if (keywords && keywords!=='') {
+        if (keywords && keywords !== '') {
             findTitle = { title: { $regex: keywords } }
         }
         try {
@@ -40,7 +40,7 @@ class QuestionCtl {
                 successHandler(ctx, result)
             }
         } catch (error) {
-            externalException('数据库查询错误')
+            throw new externalException('数据库查询错误')
         }
     }
     //收藏题目
@@ -49,13 +49,29 @@ class QuestionCtl {
         try {
             const result = await collectModel.findOne({ userId, questionId })
             if (result) {
-                successHandler(ctx, { message: '不能重复收藏' })
+                const delResult = await collectModel.deleteOne({ userId, questionId })
+                successHandler(ctx, { message: '取消收藏成功' })
             } else {
                 const delResult = await collectModel.create({ userId, questionId })
                 successHandler(ctx, { message: '收藏成功' })
             }
         } catch (error) {
-            externalException('数据库更新错误')
+            throw new externalException('数据库更新错误')
+        }
+    }
+    //查询收藏状态
+    async getCollectStatus(ctx) {
+        const { id, questionId } = ctx.query
+        try {
+            const result = await collectModel.find({ userId: id, questionId })
+            if (result.length) {
+                successHandler(ctx, { message: '已收藏', code: 1 })
+            } else {
+                successHandler(ctx, { message: '未收藏', code: 0 })
+            }
+        } catch (error) {
+            console.log(error);
+            throw new externalException('数据库出错')
         }
     }
 }

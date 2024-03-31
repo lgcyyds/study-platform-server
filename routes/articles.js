@@ -1,6 +1,6 @@
 const Router = require('koa-router')
 const upload = require('../utils/upLoad.js')
-const { addArticle, getArticle, collectOrLikeArticle, commentArticle, getLikeArticle, getCollectAll, editArticle, delArticle, getReadHistory, getLikeArticleMsg, getcollectArticleMsg, getCommentArticleMsg, delMyArticleComment, delMyComment, getComment, uploadCover } = require('../controllers/articles')
+const { addArticle, getArticle, collectOrLikeArticle, commentArticle, getLikeArticle, getCollectAll, editArticle, delArticle, getReadHistory, getLikeArticleMsg, getcollectArticleMsg, getCommentArticleMsg, delMyArticleComment, delMyComment, getComment, uploadCover, getAuthorInfo } = require('../controllers/articles')
 const router = new Router({
     prefix: '/articles'
 })
@@ -21,4 +21,5 @@ router.get('/getHistory', getReadHistory)
 router.get('/getLikeArticleMsg', getLikeArticleMsg)
 router.get('/getcollectArticleMsg', getcollectArticleMsg)
 router.get('/getCommentArticleMsg', getCommentArticleMsg)
+router.get('/getAuthorInfo', getAuthorInfo)
 module.exports = router
