@@ -6,7 +6,8 @@ const collectModel = require('../model/CollectModel.js')
 const commentModel = require('../model/CommentModel.js')
 const quetionModel = require('../model/QuestionModel.js')
 const userModel = require('../model/UserModel')
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const CheckinModel = require('../model/CheckinModel.js');
 class articlesCtl {
     async addArticle(ctx) {
         const param = ctx.request.body
@@ -63,20 +64,22 @@ class articlesCtl {
                 const findResult = await collectModel.findOne({ userId, articleId })
                 if (!findResult) {
                     const updateResult = await collectModel.create({ userId, articleId })
+                    await articleModel.updateOne({ articleId }, { $inc: { collected :1}})
                     successHandler(ctx, { message: "收藏成功" })
                 } else {
                     const updateResult = await collectModel.deleteOne({ userId, articleId })
+                    await articleModel.updateOne({ articleId }, { $inc: { collected: -1 } })
                     successHandler(ctx, { message: "取消收藏成功" })
                 }
             } else {//点赞
                 const findResult = await likedModel.findOne({ userId, articleId })
-                console.log(findResult, userId, articleId);
+                await articleModel.updateOne({ articleId }, { $inc: { liked: 1 } })
                 if (!findResult) {
                     const updateResult = await likedModel.create({ userId, articleId })
                     successHandler(ctx, { message: "点赞成功" })
                 } else {
                     const updateResult = await likedModel.deleteOne({ userId, articleId })
-                    console.log(updateResult, 121);
+                    await articleModel.updateOne({ articleId }, { $inc: { liked: -1 } })
                     successHandler(ctx, { message: "取消点赞成功" })
                 }
             }
@@ -405,16 +408,29 @@ class articlesCtl {
             throw new externalException('数据库出错')
         }
     }
-    //获取文章的点赞和收藏状态以及数量
+    //获取文章的点赞和收藏状态
     async getLikedAndCollectStatus(ctx) {
-
+        const { userId, articleId } = ctx.query
+        let liked = 0
+        let collected = 0
+        try {
+            let likedState = await likedModel.find({ userId, articleId })
+            let collectState = await collectModel.find({ userId, articleId })
+            if (likedState.length) liked = 1;
+            if (collectState.length) collected = 1;
+            console.log(liked, collected);
+            successHandler(ctx, { liked, collected })
+        } catch (error) {
+            console.log(error);
+        }
     }
     //获取文章作者信息
     async getAuthorInfo(ctx) {
         const id = ctx.query.id
         try {
             const result = await userModel.findById(id)
-            successHandler(ctx, result)
+            const signCount = await CheckinModel.find({ userId: id }).countDocuments()
+            successHandler(ctx, { result, signCount })
         } catch (error) {
             console.log(error);
             throw new externalException('数据库出错')
