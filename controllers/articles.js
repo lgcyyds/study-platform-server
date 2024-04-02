@@ -225,7 +225,13 @@ class articlesCtl {
         const articleList = JSON.parse(ctx.query.articleList)
         try {
             const result = await articleModel.find({ _id: { $in: articleList } })
-            successHandler(ctx, result)
+            let list = []
+            articleList.forEach(e => {
+                result.forEach(i => {
+                    if (i._id == e) list.push(i)
+                })
+            })
+            successHandler(ctx, list)
         } catch (error) {
             console.log(error);
             throw new externalException('数据库出错')
