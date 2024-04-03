@@ -18,7 +18,8 @@ class UsersCtl {
                     let userInfo = {
                         id: userMsg._id,
                         username: userMsg.username,
-                        avatar: userMsg.avatar
+                        avatar: userMsg.avatar,
+                        email: resultMsg.email
                     }
                     successHandler(ctx, { msg: "登录成功", userInfo })
                     return
@@ -26,7 +27,8 @@ class UsersCtl {
                 let userInfo = {
                     id: resultMsg._id,
                     username: resultMsg.username,
-                    avatar: resultMsg.avatar
+                    avatar: resultMsg.avatar,
+                    email: resultMsg.email
                 }
                 successHandler(ctx, { msg: "登录成功", userInfo })
             } else {
@@ -80,9 +82,14 @@ class UsersCtl {
     //修改个人信息
     async editUserInfo(ctx) {
         const { id, username, avatar, email } = ctx.request.body
+        console.log(id, username, avatar, email);
         try {
             let result = await userModel.updateOne({ _id: id }, { username, avatar, email })
-            successHandler(ctx, { message: '修改成功' })
+            if (result) {
+                successHandler(ctx, { message: '修改成功' })   
+            } else {
+                successHandler(ctx, { message: '修改失败' }) 
+            }
         } catch (error) {
             throw new ExternalException('修改失败')
         }
@@ -90,7 +97,7 @@ class UsersCtl {
     //头像上传
     async uploadAvatar(ctx) {
         let result = {
-            filename: ctx.req.file.filename,//返回文件名
+            filename: '/'+ctx.req.file.filename,//返回文件名
             body: ctx.req.body
         }
         successHandler(ctx, result)

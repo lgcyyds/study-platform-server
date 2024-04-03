@@ -15,6 +15,11 @@ const articleSchema = new Schema({
         required: true,
         ref: 'user'
     },
+    cover: {
+        type: String,
+        require: true,
+        default: '/defaultCover.png'
+    },
     createdTime: {
         type: Date,
         default: () => Date.now(),

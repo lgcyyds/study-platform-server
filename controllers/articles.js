@@ -202,9 +202,9 @@ class articlesCtl {
     }
     //编辑文章
     async editArticle(ctx) {
-        const { id, title, content } = ctx.request.body
+        const { id, title, content, cover } = ctx.request.body
         try {
-            const result = await articleModel.updateOne({ _id: id }, { title, content })
+            const result = await articleModel.updateOne({ _id: id }, { title, content ,cover})
             successHandler(ctx, result)
         } catch (error) {
             throw new externalException('数据库出错')
